@@ -60,6 +60,15 @@ const CustomSidebar = ({ visible, onHide }) => {
             <i className="pi pi-map"></i> Listings
           </Link>
         </li>
+        <li>
+          <Link
+            to={ROUTES.EARNING}
+            className="sidebar-link"
+            onClick={handleLinkClick}
+          >
+            <i className="pi pi-map"></i> Earning
+          </Link>
+        </li>
       </ul>
     </Sidebar>
   );

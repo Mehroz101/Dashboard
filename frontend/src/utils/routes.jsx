@@ -7,6 +7,7 @@ const ROUTES =
     DASHBOARD: "/dashboard",
     SETTINGS: "/settings",
     NOTIFICATION:"/reservation",
+    EARNING:"/earning",
     LISTING:{
       LISTING_DATA:"/listings",
       LISTING_VIEW:"/listings"
