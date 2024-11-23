@@ -1,6 +1,6 @@
 import React from "react";
 
-const Earning_card = ({title,revenue,percentage}) => {
+const Earning_card = ({title,revenue,percentage,icon}) => {
   return (
     <>
         <div class="bg-white shadow-3 border-round-lg p-2 flex flex-1 align-items-start  justify-content-between gap-8">
@@ -22,9 +22,7 @@ const Earning_card = ({title,revenue,percentage}) => {
           </div>
           <div class="bg-cyan-500 text-white w-3rem h-3rem border-round-3xl flex justify-content-center  align-items-center">
             <i
-              class="pi pi-chart-line
-
-"
+              class={icon}
             ></i>
           </div>
         </div>
