@@ -76,6 +76,7 @@ const CustomSidebar = ({ visible, onHide }) => {
             onClick={handleLinkClick}
           >
             <i className="pi pi-dollar"></i> Earning
+<<<<<<< HEAD
           </Link>
         </li>
         <li>
@@ -86,6 +87,8 @@ const CustomSidebar = ({ visible, onHide }) => {
           >
             <i className="pi pi-cog"></i>
             Settings
+=======
+>>>>>>> 1c39d9d6367975e692462289f5b48ac14f65a067
           </Link>
         </li>
       </ul>
