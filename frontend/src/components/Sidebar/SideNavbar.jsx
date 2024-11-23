@@ -66,7 +66,7 @@ const CustomSidebar = ({ visible, onHide }) => {
             className="sidebar-link"
             onClick={handleLinkClick}
           >
-            <i className="pi pi-map"></i> Earning
+            <i className="pi pi-dollar"></i> Earning
           </Link>
         </li>
       </ul>
