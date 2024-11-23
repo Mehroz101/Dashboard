@@ -12,7 +12,7 @@ import { reservations } from "../FakeData/CustomerService";
 import Statistic_card from "../components/Statistic_card";
 import { Button } from "primereact/button";
 
-export default function DataTableView() {
+export default function Reservation() {
   const [customers, setCustomers] = useState(null);
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },

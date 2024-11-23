@@ -44,11 +44,11 @@ const CustomSidebar = ({ visible, onHide }) => {
         </li>
         <li>
           <Link
-            to={ROUTES.NOTIFICATION}
+            to={ROUTES.RESERVATION}
             className="sidebar-link"
             onClick={handleLinkClick}
           >
-            <i className="pi pi-bell"></i> Reservations
+            <i className="pi pi-directions-alt"></i> Reservations
           </Link>
         </li>
         <li>
@@ -62,11 +62,30 @@ const CustomSidebar = ({ visible, onHide }) => {
         </li>
         <li>
           <Link
+            to={ROUTES.NOTIFICATION}
+            className="sidebar-link"
+            onClick={handleLinkClick}
+          >
+            <i className="pi pi-bell"></i> Notifications
+          </Link>
+        </li>
+        <li>
+          <Link
             to={ROUTES.EARNING}
             className="sidebar-link"
             onClick={handleLinkClick}
           >
-            <i className="pi pi-map"></i> Earning
+            <i className="pi pi-dollar"></i> Earning
+          </Link>
+        </li>
+        <li>
+          <Link
+            to={ROUTES.SETTINGS}
+            className="sidebar-link"
+            onClick={handleLinkClick}
+          >
+            <i className="pi pi-cog"></i>
+            Settings
           </Link>
         </li>
       </ul>

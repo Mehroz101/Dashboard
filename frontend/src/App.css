@@ -80,6 +80,32 @@
   }
   .card_4 .card_left {
     background: linear-gradient(135deg, #d6a3d1, #c68bcb);
-  }
-  .datatable{
-  }
+  }/* CustomInput.css */
+
+.custom-input {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px; /* Space between inputs */
+}
+
+.custom-input label {
+  margin-bottom: 8px; /* Space between label and input */
+  font-weight: bold; /* Bold label */
+}
+
+.custom-input input{
+  padding: 15px; /* Padding inside the input */
+  border: 1px solid #ccc; /* Light gray border */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 16px; /* Font size */
+  transition: border-color 0.3s;
+  outline: none; 
+  font-size: 17px;
+}
+
+
+
+.custom-input .error {
+  color: red; /* Error message color */
+  margin-top: 4px; /* Space between input and error message */
+}

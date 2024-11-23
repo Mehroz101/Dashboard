@@ -8,9 +8,11 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Lisitngs = lazy(() => import("./pages/Listing"));
 const Users = lazy(() => import("./pages/Users"));
-const Notification = lazy(() => import("./pages/Notification"));
+const Reservation = lazy(() => import("./pages/Reservation"));
 const ListingView = lazy(() => import("./pages/ListingView"));
 const Earning = lazy(() => import("./pages/Earning"));
+const Setting = lazy(() => import("./pages/Setting"));
+const Notifications = lazy(() => import("./pages/Notifications"));
 function Fallback({ error }) {
   // Regular expression to match the file path
   const regex = /\((.*?):\d+:\d+\)/;
@@ -66,8 +68,10 @@ const AppRouter = () => {
             element={<ListingView />}
           />
         </Route>
-        <Route path={ROUTES.NOTIFICATION} element={<Notification />} />
+        <Route path={ROUTES.RESERVATION} element={<Reservation />} />
+        <Route path={ROUTES.NOTIFICATION} element={<Notifications />} />
         <Route path={ROUTES.EARNING} element={<Earning />} />
+        <Route path={ROUTES.SETTINGS} element={<Setting />} />
         <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
       </Route>
     </Routes>
