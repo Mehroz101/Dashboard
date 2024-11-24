@@ -14,10 +14,8 @@ const Earning = lazy(() => import("./pages/Earning"));
 const Setting = lazy(() => import("./pages/Setting"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 function Fallback({ error }) {
-  // Regular expression to match the file path
   const regex = /\((.*?):\d+:\d+\)/;
 
-  // Extracting the file path
   const match = error.stack.match(regex);
 
   if (match) {
