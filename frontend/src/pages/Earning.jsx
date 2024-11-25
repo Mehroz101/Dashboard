@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Earning_card from "../components/Earning_card";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import Paymenttable from "../components/PaymentTable";
+import PaymentTable from "../components/PaymentTable";
+import { useDashboard } from "../context/DataContext";
 const Earning = () => {
+  const { earningData } = useDashboard();
+
   return (
     <>
       <div className="earning_page">
@@ -28,7 +29,7 @@ const Earning = () => {
           />
         </div>
         <div className="card mt-4">
-          <Paymenttable />
+          <PaymentTable earningData={earningData} />
         </div>
       </div>
     </>
