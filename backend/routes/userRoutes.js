@@ -3,6 +3,7 @@ const {
   updateaccountinformation,
   showAccountInformation,
   allusers,
+  edituser
 } = require("../controllers/userController");
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -18,5 +19,6 @@ router.get(
   authenticateToken,
   showAccountInformation
 );
-router.get("/allusers", allusers);
+router.get("/allusers",authenticateToken ,allusers);
+router.post("/edituser",authenticateToken, edituser);
 module.exports = router;

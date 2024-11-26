@@ -12,6 +12,9 @@ import { reservations } from "../FakeData/CustomerService";
 import Statistic_card from "../components/Statistic_card";
 import { Button } from "primereact/button";
 import { useDashboard } from "../context/DataContext";
+import { cencelrequest, confirmrequest } from "../services/apiService";
+import { useMutation } from "@tanstack/react-query";
+import { notify } from "../utils/notification";
 
 export default function Reservation({ hidecard = false }) {
   const [customers, setCustomers] = useState(null);
@@ -32,12 +35,38 @@ export default function Reservation({ hidecard = false }) {
     "completed",
     "reserved",
   ];
-  const { reservationData } = useDashboard();
+  const { reservationData, getReservationData } = useDashboard();
 
   useEffect(() => {
     setCustomers(reservationData);
     setLoading(false);
   }, []);
+  const confirmRequestMutation = useMutation({
+    mutationFn: confirmrequest,
+    onSuccess: (data) => {
+      notify("success", data.message);
+      getReservationData;
+    },
+    onError: (error) => {
+      console.error("Error adding user:", error.message);
+    },
+  });
+  const confirmRequest = (id) => {
+    confirmRequestMutation.mutate(id);
+  };
+  const cencelRequestMutation = useMutation({
+    mutationFn: cencelrequest,
+    onSuccess: (data) => {
+      notify("success", data.message);
+      getReservationData();
+    },
+    onError: (error) => {
+      console.error("Error adding user:", error.message);
+    },
+  });
+  const cencelRequest = (id) => {
+    cencelRequestMutation.mutate(id);
+  };
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
@@ -68,7 +97,31 @@ export default function Reservation({ hidecard = false }) {
   const statusBodyTemplate = (rowData) => {
     return <Tag value={rowData.state} severity={getSeverity(rowData.state)} />;
   };
+  const actionBodyTemplate = (rowData) => {
+    return (
+      <>
+        <div className="flex justify-content-center gap-2 align-items-center">
+          {rowData.state === "pending" && (
+            <>
+              <Button
+                icon="pi pi-check-circle"
+                className="p-button-success "
+                tooltip="confirm"
+                onClick={() => confirmRequest(rowData._id)}
+              />
 
+              <Button
+                icon="pi pi-ban"
+                className="p-button-danger"
+                tooltip="cencelled"
+                onClick={() => cencelRequest(rowData._id)}
+              />
+            </>
+          )}
+        </div>
+      </>
+    );
+  };
   const getSeverity = (status) => {
     switch (status) {
       case "confirmed":
@@ -209,6 +262,11 @@ export default function Reservation({ hidecard = false }) {
               filterElement={statusRowFilterTemplate}
               style={{ minWidth: "12rem" }}
               body={statusBodyTemplate}
+            />
+            <Column
+              header="Action"
+              style={{ minWidth: "12rem" }}
+              body={actionBodyTemplate}
             />
           </DataTable>
         </div>

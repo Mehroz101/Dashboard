@@ -61,7 +61,6 @@ export const editUser = async (data) => {
         Authorization: `Bearer ${token}`, // Add the token to the Authorization header
       },
     };
-    console.log(data);
     const response = await axios.post(
       `${API_URL}/api/user/edituser`,
       data,
@@ -139,6 +138,51 @@ export const fetchAllUserData = async () => {
       },
     };
     const response = await axios.get(`${API_URL}/api/user/allusers`, config);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    notify("error", error.response.data.message);
+  }
+};
+export const confirmrequest = async (reservartionId) => {
+  try {
+    const data = { reservartionId };
+    console.log("axios");
+    console.log(data);
+    const token = localStorage.getItem("admintoken");
+    console.log(token); // Retrieve the token from localStorage
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
+    };
+    const response = await axios.post(
+      `${API_URL}/api/reservation/confirmbyadmin`,
+      data,
+      config
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    notify("error", error.response.data.message);
+  }
+};
+export const cencelrequest = async (reservationId) => {
+  try {
+    const data = { reservationId };
+    console.log(data);
+    const token = localStorage.getItem("admintoken");
+    console.log(token); // Retrieve the token from localStorage
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
+    };
+    const response = await axios.post(
+      `${API_URL}/api/reservation/cancelbyadmin`,
+      data,
+      config
+    );
     console.log(response.data);
     return response.data;
   } catch (error) {

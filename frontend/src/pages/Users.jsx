@@ -46,6 +46,7 @@ const Users = () => {
     control: editUserControl,
     handleSubmit: handleEditSubmit,
     setValue,
+    getValues
   } = useForm({
     defaultValues: {
       fName: "",
@@ -53,7 +54,7 @@ const Users = () => {
       Email: "",
       Number: "",
       Password: "",
-      userId: "",
+      userId: null,
     },
   }); // Edit form
 
@@ -95,19 +96,19 @@ const Users = () => {
 
   // Edit user submission
   const handleEditUserSubmit = (data) => {
-    console.log(data);
-    setValue("userId", selectedUser._id);
     editUserMutation.mutate(data);
-    setShowDialog(false);
   };
 
   // Open edit dialog
   const handleEditUser = (user) => {
     setSelectedUser(user);
+    console.log("user")
+    console.log(user)
     setValue("fName", user.fName);
     setValue("lName", user.lName);
     setValue("Email", user.email);
     setValue("Number", user.phone);
+    setValue("userId", user._id);
     setValue("Password", ""); // Optionally pre-fill password field
     setShowDialog(true);
   };
@@ -181,11 +182,11 @@ const Users = () => {
                 className="p-button-warning"
                 onClick={() => handleEditUser(rowData)}
               />
-              <Button
+              {/* <Button
                 icon="pi pi-pause"
                 className="p-button-danger"
                 onClick={() => toggleUser(rowData.id)}
-              />
+              /> */}
             </div>
           )}
           header="Actions"
@@ -271,7 +272,7 @@ const Users = () => {
                 control={editUserControl}
                 ID="Password"
                 type="password"
-                required
+                placeHolder="leave it empty if you do not want to chnage password"
               />
             </FormColumn>
             <FormColumn>

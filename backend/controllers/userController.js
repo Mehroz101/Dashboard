@@ -55,4 +55,65 @@ const allusers = async (req, res) => {
     console.log(error.message);
   }
 };
-module.exports = { showAccountInformation, updateaccountinformation, allusers };
+const edituser = async (req, res) => {
+  try {
+    const { userId, fName, lName, Email, Number, Password } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Check if the new email is already taken by another user
+    if (Email && Email !== user.email) {
+      const isEmailTaken = await User.findOne({ email: Email });
+      if (isEmailTaken) {
+        return res.status(409).json({
+          success: false,
+          message: "Email is already taken by another user",
+        });
+      }
+    }
+
+    // Hash the password if it's being updated
+    let updatedFields = {
+      fName,
+      lName,
+      email: Email,
+      phone: Number,
+    };
+    if (Password) {
+      const hashedPassword = await bcryptjs.hash(Password, 10);
+      updatedFields.password = hashedPassword;
+    }
+
+    // Update the user details
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updatedFields },
+      { new: true } // Return the updated user
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "User details updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+module.exports = {
+  showAccountInformation,
+  updateaccountinformation,
+  allusers,
+  edituser,
+};
