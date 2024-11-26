@@ -104,7 +104,9 @@ export default function Paymenttable({ earningData }) {
   const statusItemTemplate = (option) => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
-
+  const snoBodyTemplate = (rowData, options) => {
+    return options.rowIndex + 1; // Row index starts from 0, so add 1 for 1-based numbering
+  };
   const statusRowFilterTemplate = (options) => {
     return (
       <Dropdown
@@ -136,7 +138,11 @@ export default function Paymenttable({ earningData }) {
         header={header}
         emptyMessage="No customers found."
       >
-        <Column header="Sno." field="id" style={{ minWidth: "2rem" }} />
+        <Column
+          header="Sno."
+          body={snoBodyTemplate}
+          style={{ minWidth: "3rem", textAlign: "center" }}
+        />{" "}
         <Column header="Date" field="createdAt" style={{ minWidth: "10rem" }} />
         <Column
           field="accountName"
@@ -163,7 +169,6 @@ export default function Paymenttable({ earningData }) {
           field="accountType"
           style={{ minWidth: "14rem" }}
         />
-
         <Column
           field="status"
           header="Status"

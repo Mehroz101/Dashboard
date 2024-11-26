@@ -4,6 +4,7 @@ const API_URL = "http://localhost:5000";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const [checkuserstatus, setCheckuserstatus] = useState(false);
   const login = (token) => {
     localStorage.setItem("admintoken", token);
   };
@@ -11,10 +12,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("admintoken");
   };
   const checkuser = () => {
-    return localStorage.getItem("admintoken") ? true : false;
+    if (localStorage.getItem("admintoken") !== null) {
+      setCheckuserstatus(true);
+    } else {
+      setCheckuserstatus(false);
+    }
   };
 
-  const value = { login, logout, checkuser }; // Return checkuser
+  const value = { login, logout, checkuser, checkuserstatus }; // Return checkuser
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

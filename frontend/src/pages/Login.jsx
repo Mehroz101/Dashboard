@@ -7,6 +7,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { loginAdmin } from "../services/apiService";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { notify } from "../utils/notification";
 const Login = () => {
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -20,9 +21,11 @@ const Login = () => {
     mutationFn: loginAdmin,
     onSuccess: (data) => {
       login(data.token);
+      notify("success", "login successfully");
       navigate("/dashboard");
     },
     onError: (error) => {
+      notify("error", error);
       console.error("Error adding user:", error.message);
     },
   });

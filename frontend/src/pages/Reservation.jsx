@@ -13,7 +13,7 @@ import Statistic_card from "../components/Statistic_card";
 import { Button } from "primereact/button";
 import { useDashboard } from "../context/DataContext";
 
-export default function Reservation() {
+export default function Reservation({ hidecard = false }) {
   const [customers, setCustomers] = useState(null);
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -116,43 +116,45 @@ export default function Reservation() {
   const requestTimeTemplate = (rowData) => {
     return <>{rowData.createdAt}</>;
   };
-
+  const snoBodyTemplate = (rowData, options) => {
+    return options.rowIndex + 1; // Row index starts from 0, so add 1 for 1-based numbering
+  };
   const header = renderHeader();
 
   return (
     <>
       <div className="reservation_page">
-        {/* <div className="create_request_btn flex justify-content-end mb-2">
-          <Button
-            label="Add New Space"
-            icon="pi pi-plus"
-            onClick={() => console.log("add user")}
-          />
-        </div> */}
-        <div className="state_card flex mb-4 ">
-          <div className="w-4">
-            <Statistic_card
-              card_number={4}
-              card_heading="Total Reservation"
-              card_icon="pi pi-map"
-              card_count={customers?.length}
-            />
+        {!hidecard && (
+          <div className="state_card flex mb-4 ">
+            <div className="w-4">
+              <Statistic_card
+                card_number={4}
+                card_heading="Total Reservation"
+                card_icon="pi pi-map"
+                card_count={customers?.length}
+              />
+            </div>
           </div>
-        </div>
+        )}
+
         <div className="card">
           <DataTable
             value={customers}
             paginator
-            rows={10}
+            rows={5}
             dataKey="id"
             filters={filters}
+            globalFilterFields={["name", "email", "spaceId", "reservationId"]}
             filterDisplay="row"
             loading={loading}
-            globalFilterFields={["name", "email", "spaceId", "reservationId"]}
             header={header}
             emptyMessage="No customers found."
           >
-            <Column field="id" header="Sno." style={{ minWidth: "4rem" }} />
+            <Column
+              header="Sno."
+              body={snoBodyTemplate}
+              style={{ minWidth: "3rem", textAlign: "center" }}
+            />
 
             <Column
               field="name"

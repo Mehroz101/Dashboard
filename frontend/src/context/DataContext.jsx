@@ -7,6 +7,7 @@ import {
   fetchAllSpaceReviewsData,
   fetchAllUserData,
 } from "../services/apiService";
+import { useAuth } from "./AuthContext";
 
 // Define the API URL
 
@@ -15,6 +16,7 @@ const DashboardContext = createContext();
 
 export const DashboardContextProvider = ({ children }) => {
   // Define your fetch functions
+  const { checkuserstatus } = useAuth();
 
   // Using `useQuery` hook to fetch data
   const {
@@ -24,25 +26,38 @@ export const DashboardContextProvider = ({ children }) => {
   } = useQuery({
     queryKey: ["reservationData"],
     queryFn: fetchAllReservationData,
+    enabled: checkuserstatus,
   });
 
   const {
     data: spaceData,
     isLoading: spaceLoading,
     refetch: getSpaceData,
-  } = useQuery({ queryKey: ["spaceData"], queryFn: fetchAllSpaceData });
+  } = useQuery({
+    queryKey: ["spaceData"],
+    queryFn: fetchAllSpaceData,
+    enabled: checkuserstatus, // Conditional fetching
+  });
 
   const {
     data: earningData,
     isLoading: earningLoading,
     refetch: getEarningData,
-  } = useQuery({ queryKey: ["earningData"], queryFn: fetchAllEarningData });
+  } = useQuery({
+    queryKey: ["earningData"],
+    queryFn: fetchAllEarningData,
+    enabled: checkuserstatus,
+  });
 
   const {
     data: userData,
     isLoading: userLoading,
     refetch: getUserData,
-  } = useQuery({ queryKey: ["userData"], queryFn: fetchAllUserData });
+  } = useQuery({
+    queryKey: ["userData"],
+    queryFn: fetchAllUserData,
+    enabled: checkuserstatus,
+  });
 
   const {
     data: spaceReviewsData,
@@ -51,8 +66,12 @@ export const DashboardContextProvider = ({ children }) => {
   } = useQuery({
     queryKey: ["spaceReviewsData"],
     queryFn: fetchAllSpaceReviewsData(),
+    enabled: checkuserstatus,
   });
-
+  if (checkuserstatus) {
+    if (!reservationData || !spaceData || !earningData || !userData)
+      return <div>Loading...</div>;
+  }
   // Return the context provider with the necessary values
   return (
     <DashboardContext.Provider

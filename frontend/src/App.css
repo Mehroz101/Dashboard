@@ -135,3 +135,12 @@
   color: red; /* Error message color */
   margin-top: 4px; /* Space between input and error message */
 }
+.user-management .header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.user-management .header .stat_card{
+  max-width: 400px;
+}

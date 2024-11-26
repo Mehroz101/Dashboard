@@ -15,8 +15,9 @@ import { useForm } from "react-hook-form";
 import TextInput from "../components/TextInput";
 import { FormColumn, FormLabel, FormRow } from "../components/layoutComponent";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { addUser, fetchUsers } from "../services/apiService";
+import { addUser, editUser, fetchUsers } from "../services/apiService";
 import { useDashboard } from "../context/DataContext";
+import { notify } from "../utils/notification";
 
 const Users = () => {
   const [users, setUsers] = useState([]); // User data
@@ -24,7 +25,14 @@ const Users = () => {
   const [addNewUser, setAddNewUser] = useState(false); // Add dialog
   const [selectedUser, setSelectedUser] = useState(null); // Current user for editing
   const toast = React.createRef();
-  const { userData } = useDashboard();
+  const [filters, setFilters] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    fName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    lName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    email: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    phone: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+  });
+  const { userData, getUserData } = useDashboard();
   const { control: addUserControl, handleSubmit: handleAddSubmit } = useForm({
     defaultValues: {
       fName: "",
@@ -44,24 +52,10 @@ const Users = () => {
       lName: "",
       Email: "",
       Number: "",
+      Password: "",
+      userId: "",
     },
   }); // Edit form
-
-  // const { data, isLoading, error, refetch } = useQuery({
-  //   queryKey: ["users"],
-  //   queryFn: fetchUsers,
-
-  //   onSuccess: (data) => {
-  //     console.log("Fetched data successfully:", data);
-  //     setUsers(data);
-  //   },
-  //   onError: (error) => {
-  //     console.error("Error fetching users:", error.message);
-  //   },
-  //   onSettled: () => {
-  //     console.log("Fetching users completed");
-  //   },
-  // });
 
   useEffect(() => {
     if (userData) {
@@ -74,18 +68,20 @@ const Users = () => {
   const addUserMutation = useMutation({
     mutationFn: addUser,
     onSuccess: (data) => {
-      console.log("User added successfully:", data);
-      refetch();
+      notify("success", data.message);
+      getUserData();
+      setAddNewUser(false);
     },
     onError: (error) => {
       console.error("Error adding user:", error.message);
     },
   });
   const editUserMutation = useMutation({
-    mutationFn: addUser,
+    mutationFn: editUser,
     onSuccess: (data) => {
-      console.log("User added successfully:", data);
-      refetch();
+      // console.log("User added successfully:", data);
+      notify("success", data.message);
+      setAddNewUser(false);
     },
     onError: (error) => {
       console.error("Error adding user:", error.message);
@@ -95,12 +91,13 @@ const Users = () => {
   const handleAddUserSubmit = (data) => {
     console.log(data);
     addUserMutation.mutate(data);
-    setAddNewUser(false);
   };
 
   // Edit user submission
   const handleEditUserSubmit = (data) => {
-    mutate.editUserMutation(data);
+    console.log(data);
+    setValue("userId", selectedUser._id);
+    editUserMutation.mutate(data);
     setShowDialog(false);
   };
 
@@ -114,20 +111,15 @@ const Users = () => {
     setValue("Password", ""); // Optionally pre-fill password field
     setShowDialog(true);
   };
-
+  const snoBodyTemplate = (rowData, options) => {
+    return options.rowIndex + 1; // Row index starts from 0, so add 1 for 1-based numbering
+  };
   return (
     <div className="user-management">
       <Toast ref={toast} />
 
       {/* Header Section */}
-      <div
-        className="header"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "1rem",
-        }}
-      >
+      <div className="header">
         <Statistic_card
           card_number={1}
           card_heading="Total Users"
@@ -146,15 +138,41 @@ const Users = () => {
       <DataTable
         value={users}
         paginator
-        rows={10}
+        rows={5}
         dataKey="id"
-        globalFilterFields={["name", "email", "phoneNumber"]}
+        filters={filters}
+        filterDisplay="row"
+        globalFilterFields={["fName", "lName", "email", "phoneNumber"]}
       >
-        <Column field="id" header="ID" />
-        <Column field="fName" header="First Name" />
-        <Column field="lName" header="Last Name" />
-        <Column field="email" header="Email" />
-        <Column field="phone" header="Phone Number" />
+        <Column
+          header="Sno."
+          body={snoBodyTemplate}
+          style={{ minWidth: "3rem", textAlign: "center" }}
+        />{" "}
+        <Column
+          field="fName"
+          filter
+          filterPlaceholder="Search by first name"
+          header="First Name"
+        />
+        <Column
+          field="lName"
+          filter
+          filterPlaceholder="Search by last name"
+          header="Last Name"
+        />
+        <Column
+          field="email"
+          filter
+          filterPlaceholder="Search by email"
+          header="Email"
+        />
+        <Column
+          field="phone"
+          filter
+          filterPlaceholder="Search by number"
+          header="Phone Number"
+        />
         <Column
           body={(rowData) => (
             <div className="flex gap-2">
@@ -164,9 +182,9 @@ const Users = () => {
                 onClick={() => handleEditUser(rowData)}
               />
               <Button
-                icon="pi pi-trash"
+                icon="pi pi-pause"
                 className="p-button-danger"
-                onClick={() => deleteUser(rowData.id)}
+                onClick={() => toggleUser(rowData.id)}
               />
             </div>
           )}

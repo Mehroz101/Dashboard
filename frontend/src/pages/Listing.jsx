@@ -105,6 +105,9 @@ export default function BasicFilterDemo() {
       });
       setCustomers(updatedCustomers);
     };
+    const snoBodyTemplate = (rowData, options) => {
+      return options.rowIndex + 1; // Row index starts from 0, so add 1 for 1-based numbering
+    };
 
     return (
       <div>
