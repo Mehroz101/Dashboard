@@ -1,21 +1,28 @@
 import React from "react";
 import { Menubar } from "primereact/menubar";
-import { InputText } from "primereact/inputtext";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-export default function Navbar({ visible, onShow }) {
- 
+export default function Navbar({ onShow }) {
+  const { checkuser } = useAuth();
 
-  const end = (
-    <div className="flex align-items-center gap-2">
-      <Avatar
-        image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-        shape="circle"
-        className="mr-2"
-      />
-      <span className="mr-2">Profile Name</span>
-    </div>
+  const end = checkuser() ? (
+    <>
+      <div className="flex align-items-center">
+        <Avatar
+          image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+          shape="circle"
+          className="mr-2"
+        />
+        <span className="mr-2">Admin</span>
+      </div>
+    </>
+  ) : (
+    <Link to="/login" className="login_btn">
+      <Button label="Login" className="p-button-text" />
+    </Link>
   );
 
   return (

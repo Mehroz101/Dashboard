@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -10,233 +10,282 @@ import { Dialog } from "primereact/dialog";
 import { usersData } from "../FakeData/CustomerService";
 import Statistic_card from "../components/Statistic_card";
 import { FilterMatchMode } from "primereact/api";
+import { Password } from "primereact/password";
+import { useForm } from "react-hook-form";
+import TextInput from "../components/TextInput";
+import { FormColumn, FormLabel, FormRow } from "../components/layoutComponent";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { addUser, editUser, fetchUsers } from "../services/apiService";
+import { useDashboard } from "../context/DataContext";
+import { notify } from "../utils/notification";
 
 const Users = () => {
-  const [users, setUsers] = useState([]); // Replace with your user data
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [users, setUsers] = useState([]); // User data
+  const [showDialog, setShowDialog] = useState(false); // Edit dialog
+  const [addNewUser, setAddNewUser] = useState(false); // Add dialog
+  const [selectedUser, setSelectedUser] = useState(null); // Current user for editing
   const toast = React.createRef();
-  const addUser = () => {
-    // Logic to add a user
-    toast.current.show({
-      severity: "success",
-      summary: "User  Added",
-      detail: "User  has been added successfully!",
-    });
+  const [filters, setFilters] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    fName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    lName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    email: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    phone: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+  });
+  const { userData, getUserData } = useDashboard();
+  const { control: addUserControl, handleSubmit: handleAddSubmit } = useForm({
+    defaultValues: {
+      fName: "",
+      lName: "",
+      Email: "",
+      Password: "",
+      Number: "",
+    },
+  }); // Add form
+  const {
+    control: editUserControl,
+    handleSubmit: handleEditSubmit,
+    setValue,
+  } = useForm({
+    defaultValues: {
+      fName: "",
+      lName: "",
+      Email: "",
+      Number: "",
+      Password: "",
+      userId: "",
+    },
+  }); // Edit form
+
+  useEffect(() => {
+    if (userData) {
+      console.log(userData);
+      setUsers(userData);
+    }
+  }, [userData]);
+
+  // console.log(data);
+  const addUserMutation = useMutation({
+    mutationFn: addUser,
+    onSuccess: (data) => {
+      notify("success", data.message);
+      getUserData();
+      setAddNewUser(false);
+    },
+    onError: (error) => {
+      console.error("Error adding user:", error.message);
+    },
+  });
+  const editUserMutation = useMutation({
+    mutationFn: editUser,
+    onSuccess: (data) => {
+      // console.log("User added successfully:", data);
+      notify("success", data.message);
+      setAddNewUser(false);
+    },
+    onError: (error) => {
+      console.error("Error adding user:", error.message);
+    },
+  });
+  // Add user submission
+  const handleAddUserSubmit = (data) => {
+    console.log(data);
+    addUserMutation.mutate(data);
   };
 
-  const editUser = (user) => {
+  // Edit user submission
+  const handleEditUserSubmit = (data) => {
+    console.log(data);
+    setValue("userId", selectedUser._id);
+    editUserMutation.mutate(data);
+    setShowDialog(false);
+  };
+
+  // Open edit dialog
+  const handleEditUser = (user) => {
     setSelectedUser(user);
+    setValue("fName", user.fName);
+    setValue("lName", user.lName);
+    setValue("Email", user.email);
+    setValue("Number", user.phone);
+    setValue("Password", ""); // Optionally pre-fill password field
     setShowDialog(true);
   };
-
-  const deleteUser = (userId) => {
-    // Logic to delete a user
-    setUsers(users.filter((user) => user.id !== userId));
-    toast.current.show({
-      severity: "success",
-      summary: "User  Deleted",
-      detail: "User  has been deleted successfully!",
-    });
+  const snoBodyTemplate = (rowData, options) => {
+    return options.rowIndex + 1; // Row index starts from 0, so add 1 for 1-based numbering
   };
-
-  const viewUser = (user) => {
-    // Logic to view user details
-    toast.current.show({
-      severity: "info",
-      summary: "User  Details",
-      detail: `Viewing details for ${user.name}`,
-    });
-  };
-
-  const toggleUserStatus = (user) => {
-    // Logic to toggle user status
-    const updatedUsers = users.map((u) => {
-      if (u.id === user.id) {
-        return { ...u, active: !u.active };
-      }
-      return u;
-    });
-    setUsers(updatedUsers);
-    toast.current.show({
-      severity: "info",
-      summary: "Status Updated",
-      detail: `${user.name}'s status has been updated.`,
-    });
-  };
-  useEffect(() => {
-    setUsers(usersData);
-  }, []);
-
-  const actionBodyTemplate = (rowData) => {
-    return (
-      <div className="flex align-items-center justify-content-center gap-2 flex-nowrap">
-        <Button
-          icon="pi pi-pencil"
-          className="p-button-warning"
-          onClick={() => editUser(rowData)}
-        />
-        <Button
-          icon="pi pi-trash"
-          className="p-button-danger"
-          onClick={() => deleteUser(rowData.id)}
-        />
-        <Button
-          icon="pi pi-eye"
-          className="p-button-info"
-          onClick={() => viewUser(rowData)}
-        />
-      </div>
-    );
-  };
-
   return (
     <div className="user-management">
       <Toast ref={toast} />
-      <div
-        className="header"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "1rem",
-          flexWrap: "wrap",
-          gap: "10px",
-        }}
-      >
-        <div className="w-4">
-          <Statistic_card
-            card_number={1}
-            card_heading="Total Users"
-            card_icon="pi pi-user"
-            card_count={users.length}
-          />
-        </div>
 
-        <Button label="Add New User" icon="pi pi-plus" onClick={addUser} />
+      {/* Header Section */}
+      <div className="header">
+        <Statistic_card
+          card_number={1}
+          card_heading="Total Users"
+          card_icon="pi pi-user"
+          card_count={users.length}
+        />
+        <Button
+          label="Add New User"
+          icon="pi pi-plus"
+          onClick={() => setAddNewUser(true)}
+          className="p-button-success align-self-start"
+        />
       </div>
+
+      {/* Users Table */}
       <DataTable
         value={users}
         paginator
-        rows={10}
+        rows={5}
         dataKey="id"
-        emptyMessage="No users found."
-        // filters={filters}
+        filters={filters}
         filterDisplay="row"
-        globalFilterFields={["name", "email", "phoneNumber", "status"]}
+        globalFilterFields={["fName", "lName", "email", "phoneNumber"]}
       >
-        <Column field="sno" header="Sno." style={{ width: "4rem" }} />
         <Column
-          field="name"
-          header="Name"
+          header="Sno."
+          body={snoBodyTemplate}
+          style={{ minWidth: "3rem", textAlign: "center" }}
+        />{" "}
+        <Column
+          field="fName"
           filter
-          filterPlaceholder="Search by name"
-          style={{ width: "20rem" }}
+          filterPlaceholder="Search by first name"
+          header="First Name"
+        />
+        <Column
+          field="lName"
+          filter
+          filterPlaceholder="Search by last name"
+          header="Last Name"
         />
         <Column
           field="email"
-          header="Email"
           filter
           filterPlaceholder="Search by email"
-          style={{ width: "20rem" }}
+          header="Email"
         />
-        <Column field="password" header="Password" style={{ width: "10rem" }} />
         <Column
-          field="phoneNumber"
-          header="Phone Number"
+          field="phone"
           filter
           filterPlaceholder="Search by number"
-          style={{ width: "10rem" }}
+          header="Phone Number"
         />
         <Column
-          field="noOfReservations"
-          header="No. of Reservations"
-          style={{ width: "10rem" }}
-        />
-        <Column
-          field="noOfSpaces"
-          header="No. of Spaces"
-          style={{ width: "10rem" }}
-        />
-        <Column
-          body={actionBodyTemplate}
-          header="Actions"
-          style={{ minWidth: "5rem" }}
-        />
-        <Column
-          
           body={(rowData) => (
-            <>
-              <ToggleButton
-                onIcon="pi pi-pause-circle"
-                offIcon="pi pi-play-circle"
-                checked={rowData.active}
-                onChange={() => toggleUserStatus(rowData)}
-                className="w-3rem"
+            <div className="flex gap-2">
+              <Button
+                icon="pi pi-pencil"
+                className="p-button-warning"
+                onClick={() => handleEditUser(rowData)}
               />
-            </>
+              <Button
+                icon="pi pi-pause"
+                className="p-button-danger"
+                onClick={() => toggleUser(rowData.id)}
+              />
+            </div>
           )}
-          header="Status"
-          style={{ width: "10rem" }}
+          header="Actions"
         />
       </DataTable>
 
+      {/* Add User Dialog */}
+      <Dialog
+        header="Add New User"
+        visible={addNewUser}
+        onHide={() => setAddNewUser(false)}
+      >
+        <form onSubmit={handleAddSubmit(handleAddUserSubmit)}>
+          <FormRow>
+            <FormColumn>
+              <FormLabel>First Name</FormLabel>
+              <TextInput control={addUserControl} ID="fName" required />
+            </FormColumn>
+            <FormColumn>
+              <FormLabel>Last Name</FormLabel>
+              <TextInput control={addUserControl} ID="lName" required />
+            </FormColumn>
+            <FormColumn>
+              <FormLabel>Email</FormLabel>
+              <TextInput
+                control={addUserControl}
+                ID="Email"
+                type="email"
+                required
+              />
+            </FormColumn>
+            <FormColumn>
+              <FormLabel>Password</FormLabel>
+              <TextInput
+                control={addUserControl}
+                ID="Password"
+                type="password"
+                required
+              />
+            </FormColumn>
+            <FormColumn>
+              <FormLabel>Number</FormLabel>
+              <TextInput
+                control={addUserControl}
+                ID="Number"
+                type="number"
+                required
+              />
+            </FormColumn>
+          </FormRow>
+          <Button type="submit" label="Save" />
+        </form>
+      </Dialog>
+
+      {/* Edit User Dialog */}
       <Dialog
         header="Edit User"
         visible={showDialog}
         onHide={() => setShowDialog(false)}
       >
-        <div className="flex flex-column">
-          <InputText
-            placeholder="Name"
-            value={selectedUser ? selectedUser.name : ""}
-            onChange={(e) =>
-              setSelectedUser({ ...selectedUser, name: e.target.value })
-            }
-          />
-          <br />
-          <InputText
-            placeholder="Email"
-            value={selectedUser ? selectedUser.email : ""}
-            onChange={(e) =>
-              setSelectedUser({ ...selectedUser, email: e.target.value })
-            }
-          />
-          <br />
-          <InputText
-            placeholder="Password"
-            type="password"
-            value={selectedUser ? selectedUser.password : ""}
-            onChange={(e) =>
-              setSelectedUser({ ...selectedUser, password: e.target.value })
-            }
-          />
-          <br />
-          <InputText
-            placeholder="Phone Number"
-            value={selectedUser ? selectedUser.phoneNumber : ""}
-            onChange={(e) =>
-              setSelectedUser({ ...selectedUser, phoneNumber: e.target.value })
-            }
-          />
-          <br />
-          <Button
-            label="Save"
-            onClick={() => {
-              // Logic to save the edited user
-              const updatedUsers = users.map((u) =>
-                u.id === selectedUser.id ? selectedUser : u
-              );
-              setUsers(updatedUsers);
-              setShowDialog(false);
-              toast.current.show({
-                severity: "success",
-                summary: "User  Updated",
-                detail: "User  details have been updated successfully!",
-              });
-            }}
-          />
-        </div>
+        <form onSubmit={handleEditSubmit(handleEditUserSubmit)}>
+          <FormRow>
+            <FormColumn>
+              <FormLabel>First Name</FormLabel>
+              <TextInput control={editUserControl} ID="fName" required />
+            </FormColumn>
+            <FormColumn>
+              <FormLabel>Last Name</FormLabel>
+              <TextInput control={editUserControl} ID="lName" required />
+            </FormColumn>
+            <FormColumn>
+              <FormLabel>Email</FormLabel>
+              <TextInput
+                control={editUserControl}
+                ID="Email"
+                type="email"
+                required
+              />
+            </FormColumn>
+            <FormColumn>
+              <FormLabel>Password</FormLabel>
+              <TextInput
+                control={editUserControl}
+                ID="Password"
+                type="password"
+                required
+              />
+            </FormColumn>
+            <FormColumn>
+              <FormLabel>Number</FormLabel>
+              <TextInput
+                control={editUserControl}
+                ID="Number"
+                type="number"
+                required
+              />
+            </FormColumn>
+          </FormRow>
+          <Button type="submit" label="Save" />
+        </form>
       </Dialog>
     </div>
   );

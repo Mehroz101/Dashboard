@@ -13,7 +13,7 @@ import { TriStateCheckbox } from "primereact/tristatecheckbox";
 import { accounts } from "../FakeData/CustomerService";
 import { Button } from "primereact/button";
 
-export default function Paymenttable() {
+export default function Paymenttable({ earningData }) {
   const [customers, setCustomers] = useState(null);
   const [filters, setFilters] = useState({
     name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -40,8 +40,7 @@ export default function Paymenttable() {
   };
 
   useEffect(() => {
-    console.log(accounts);
-    setCustomers(accounts);
+    setCustomers(earningData);
     setLoading(false);
   }, []);
 
@@ -105,7 +104,9 @@ export default function Paymenttable() {
   const statusItemTemplate = (option) => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
-
+  const snoBodyTemplate = (rowData, options) => {
+    return options.rowIndex + 1; // Row index starts from 0, so add 1 for 1-based numbering
+  };
   const statusRowFilterTemplate = (options) => {
     return (
       <Dropdown
@@ -137,10 +138,14 @@ export default function Paymenttable() {
         header={header}
         emptyMessage="No customers found."
       >
-        <Column header="Sno." field="id" style={{ minWidth: "2rem" }} />
-        <Column header="Date" field="date" style={{ minWidth: "10rem" }} />
         <Column
-          field="name"
+          header="Sno."
+          body={snoBodyTemplate}
+          style={{ minWidth: "3rem", textAlign: "center" }}
+        />{" "}
+        <Column header="Date" field="createdAt" style={{ minWidth: "10rem" }} />
+        <Column
+          field="accountName"
           header="Name"
           filter
           filterPlaceholder="Search by name"
@@ -148,7 +153,7 @@ export default function Paymenttable() {
         />
         <Column
           header="phone number"
-          field="phoneNumber"
+          field="accountNumber"
           style={{ minWidth: "12rem" }}
         />
         <Column
@@ -164,7 +169,6 @@ export default function Paymenttable() {
           field="accountType"
           style={{ minWidth: "14rem" }}
         />
-
         <Column
           field="status"
           header="Status"

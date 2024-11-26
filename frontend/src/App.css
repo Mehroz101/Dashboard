@@ -5,6 +5,32 @@
   .page_heading{
     font-size: 30px;
   }
+  .login_btn{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: green;
+  }
+
+  .login_page{
+    max-width: 400px;
+    flex-direction: column;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 100px auto;
+    padding: 20px;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+  }
+  .login_page  input{
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    outline: none;
+
+  }
   .statistic_cards {
     display: flex;
     justify-content: space-between;
@@ -108,4 +134,13 @@
 .custom-input .error {
   color: red; /* Error message color */
   margin-top: 4px; /* Space between input and error message */
+}
+.user-management .header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.user-management .header .stat_card{
+  max-width: 400px;
 }

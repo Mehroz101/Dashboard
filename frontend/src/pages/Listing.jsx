@@ -14,33 +14,21 @@ import { Rating } from "primereact/rating";
 import Statistic_card from "../components/Statistic_card";
 import { useNavigate } from "react-router";
 import ROUTES from "../utils/routes";
+import { useDashboard } from "../context/DataContext";
 
 export default function BasicFilterDemo() {
   const [customers, setCustomers] = useState(null);
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    "country.name": { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    representative: { value: null, matchMode: FilterMatchMode.IN },
-    status: { value: null, matchMode: FilterMatchMode.EQUALS },
-    verified: { value: null, matchMode: FilterMatchMode.EQUALS },
-    balance: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    title: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    city: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    state: { value: null, matchMode: FilterMatchMode.EQUALS },
   });
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
-  const [representatives] = useState([
-    { name: "Amy Elsner" },
-    { name: "Anna Fali" },
-    { name: "Asiya Javayant" },
-    { name: "Bernardo Dominic" },
-    { name: "Elwin Sharvill" },
-    { name: "Ioni Bowcher" },
-    { name: "Ivan Magalhaes" },
-    { name: "Onyama Limba" },
-    { name: "Stephen Shaw" },
-    { name: "XuXue Feng" },
-  ]);
   const [statuses] = useState(["active", "deactiveted"]);
+  const { spaceData } = useDashboard();
+
   const Navigate = useNavigate();
   const getSeverity = (status) => {
     switch (status) {
@@ -56,7 +44,7 @@ export default function BasicFilterDemo() {
   };
 
   useEffect(() => {
-    setCustomers(spaces);
+    setCustomers(spaceData);
     setLoading(false);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -90,7 +78,7 @@ export default function BasicFilterDemo() {
       <div className="flex align-items-center gap-2">
         <img
           alt="flag"
-          src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
+          src={`http://localhost:5000/${rowData.images[0]}`}
           className={`flag flag-${rowData.country.code}`}
           style={{ width: "50px" }}
         />
@@ -98,28 +86,8 @@ export default function BasicFilterDemo() {
     );
   };
 
-  const representativeBodyTemplate = (rowData) => {
-    const representative = rowData.representative;
-
-    return (
-      <div className="flex align-items-center gap-2">
-        <span>{representative.name}</span>
-      </div>
-    );
-  };
-
-  const representativesItemTemplate = (option) => {
-    return (
-      <div className="flex align-items-center gap-2">
-        <span>{option.name}</span>
-      </div>
-    );
-  };
-
   const statusBodyTemplate = (rowData) => {
-    return (
-      <Tag value={rowData.status} severity={getSeverity(rowData.status)} />
-    );
+    return <Tag value={rowData.state} severity={getSeverity(rowData.state)} />;
   };
 
   const statusItemTemplate = (option) => {
@@ -130,17 +98,15 @@ export default function BasicFilterDemo() {
     const toggleStatus = () => {
       // Create a new array with the updated status
       const updatedCustomers = customers.map((customer) => {
-        if (customer.id === rowData.id) {
-          return {
-            ...customer,
-            status: customer.status === "active" ? "deactivated" : "active",
-          };
+        if (customer._id === rowData._id) {
+          updateSpaceStatus(rowData._id);
         }
         return customer;
       });
-
-      // Update the customers state
       setCustomers(updatedCustomers);
+    };
+    const snoBodyTemplate = (rowData, options) => {
+      return options.rowIndex + 1; // Row index starts from 0, so add 1 for 1-based numbering
     };
 
     return (
@@ -164,22 +130,6 @@ export default function BasicFilterDemo() {
     );
   };
 
-  const representativeRowFilterTemplate = (options) => {
-    return (
-      <MultiSelect
-        value={options.value}
-        options={representatives}
-        itemTemplate={representativesItemTemplate}
-        onChange={(e) => options.filterApplyCallback(e.value)}
-        optionLabel="name"
-        placeholder="Any"
-        className="p-column-filter"
-        maxSelectedLabels={1}
-        style={{ minWidth: "14rem" }}
-      />
-    );
-  };
-
   const statusRowFilterTemplate = (options) => {
     return (
       <Dropdown
@@ -196,10 +146,10 @@ export default function BasicFilterDemo() {
   };
   const viewData = (e) => {
     console.log(e.data);
-    Navigate(ROUTES.LISTING.LISTING_VIEW+`/${e.data.id}`);
+    Navigate(ROUTES.LISTING.LISTING_VIEW + `/${e.data.id}`);
   };
   const ratingBodyTemplate = (rowData) => {
-    return <Rating value={rowData.rating} readOnly cancel={false} />;
+    return <Rating value={rowData.averageRating} readOnly cancel={false} />;
   };
   const header = renderHeader();
 
@@ -242,23 +192,22 @@ export default function BasicFilterDemo() {
           selectionMode="single"
           onRowSelect={viewData}
           loading={loading}
-          globalFilterFields={[
-            "name",
-            "country.name",
-            "representative.name",
-            "status",
-          ]}
+          globalFilterFields={["title", "city", "_id", "state"]}
           header={header}
           emptyMessage="No customers found."
         >
-          <Column header="Sno" style={{ minWidth: "5rem" }} field="id" />
+          <Column
+            header="Sno."
+            headerStyle={{ width: "3rem" }}
+            body={(options) => options.rowIndex + 1}
+          ></Column>
           <Column
             header="Id"
+            field="_id"
             style={{ minWidth: "10rem" }}
-            field="balance"
             filter
             showFilterMenu={false}
-            filterPlaceholder="Filter by balance" // Optional placeholder
+            filterPlaceholder="Filter by id" // Optional placeholder
             filterMenuStyle={{ width: "7rem" }}
           />
           <Column
@@ -267,7 +216,7 @@ export default function BasicFilterDemo() {
             body={countryBodyTemplate}
           />
           <Column
-            field="name"
+            field="title"
             header="Space Name"
             filter
             showFilterMenu={false}
@@ -276,23 +225,22 @@ export default function BasicFilterDemo() {
           />
           <Column
             header="City Name"
-            filterField="representative"
+            field="city"
             showFilterMenu={false}
             filterMenuStyle={{ width: "14rem" }}
             style={{ minWidth: "14rem" }}
-            body={representativeBodyTemplate}
             filter
-            filterElement={representativeRowFilterTemplate}
+            filterPlaceholder="Search by city"
           />
           <Column
             header="Completed Requests"
+            field="totalBooking"
             showFilterMenu={false}
-            field="CompletedRequests"
             filterMenuStyle={{ width: "5rem" }}
             style={{ minWidth: "5rem" }}
           />
           <Column
-            header="Completed Requests"
+            header="Rating"
             showFilterMenu={false}
             field="CompletedRequests"
             filterMenuStyle={{ width: "14rem" }}
@@ -300,7 +248,7 @@ export default function BasicFilterDemo() {
             body={ratingBodyTemplate}
           />
           <Column
-            field="status"
+            field="state"
             header="Status"
             showFilterMenu={false}
             filterMenuStyle={{ width: "7rem" }}
@@ -310,7 +258,6 @@ export default function BasicFilterDemo() {
             filterElement={statusRowFilterTemplate}
           />
           <Column
-            field="status"
             header="Action"
             dataType="boolean"
             style={{ minWidth: "5rem" }}

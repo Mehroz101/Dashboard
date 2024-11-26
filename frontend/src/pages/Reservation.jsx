@@ -11,8 +11,9 @@ import { Tag } from "primereact/tag";
 import { reservations } from "../FakeData/CustomerService";
 import Statistic_card from "../components/Statistic_card";
 import { Button } from "primereact/button";
+import { useDashboard } from "../context/DataContext";
 
-export default function Reservation() {
+export default function Reservation({ hidecard = false }) {
   const [customers, setCustomers] = useState(null);
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -20,14 +21,21 @@ export default function Reservation() {
     email: { value: null, matchMode: FilterMatchMode.CONTAINS },
     spaceId: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     reservationId: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    status: { value: null, matchMode: FilterMatchMode.EQUALS },
+    state: { value: null, matchMode: FilterMatchMode.EQUALS },
   });
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
-  const statuses = ["confirmed", "pending", "canceled"];
+  const statuses = [
+    "confirmed",
+    "pending",
+    "cancelled",
+    "completed",
+    "reserved",
+  ];
+  const { reservationData } = useDashboard();
 
   useEffect(() => {
-    setCustomers(reservations);
+    setCustomers(reservationData);
     setLoading(false);
   }, []);
 
@@ -58,9 +66,7 @@ export default function Reservation() {
   };
 
   const statusBodyTemplate = (rowData) => {
-    return (
-      <Tag value={rowData.status} severity={getSeverity(rowData.status)} />
-    );
+    return <Tag value={rowData.state} severity={getSeverity(rowData.state)} />;
   };
 
   const getSeverity = (status) => {
@@ -69,8 +75,12 @@ export default function Reservation() {
         return "success";
       case "pending":
         return "info";
-      case "canceled":
+      case "cancelled":
         return "danger";
+      case "completed":
+        return "success";
+      case "reserved":
+        return "warning";
       default:
         return null;
     }
@@ -89,43 +99,62 @@ export default function Reservation() {
       />
     );
   };
-
+  const arrivalTimeTemplate = (rowData) => {
+    return (
+      <>
+        {rowData.arrivalDate} - {rowData.arrivalTime}
+      </>
+    );
+  };
+  const leaveTimeTemplate = (rowData) => {
+    return (
+      <>
+        {rowData.leaveDate} - {rowData.leaveTime}
+      </>
+    );
+  };
+  const requestTimeTemplate = (rowData) => {
+    return <>{rowData.createdAt}</>;
+  };
+  const snoBodyTemplate = (rowData, options) => {
+    return options.rowIndex + 1; // Row index starts from 0, so add 1 for 1-based numbering
+  };
   const header = renderHeader();
 
   return (
     <>
       <div className="reservation_page">
-        <div className="create_request_btn flex justify-content-end mb-2">
-          <Button
-            label="Add New Space"
-            icon="pi pi-plus"
-            onClick={() => console.log("add user")}
-          />
-        </div>
-        <div className="state_card flex mb-4 ">
-          <div className="w-4">
-            <Statistic_card
-              card_number={4}
-              card_heading="Total Spaces"
-              card_icon="pi pi-map"
-              card_count={customers?.length}
-            />
+        {!hidecard && (
+          <div className="state_card flex mb-4 ">
+            <div className="w-4">
+              <Statistic_card
+                card_number={4}
+                card_heading="Total Reservation"
+                card_icon="pi pi-map"
+                card_count={customers?.length}
+              />
+            </div>
           </div>
-        </div>
+        )}
+
         <div className="card">
           <DataTable
             value={customers}
             paginator
-            rows={10}
+            rows={5}
             dataKey="id"
             filters={filters}
+            globalFilterFields={["name", "email", "spaceId", "reservationId"]}
             filterDisplay="row"
             loading={loading}
-            globalFilterFields={["name", "email", "spaceId", "reservationId"]}
             header={header}
             emptyMessage="No customers found."
           >
-            <Column field="id" header="Sno." style={{ minWidth: "4rem" }} />
+            <Column
+              header="Sno."
+              body={snoBodyTemplate}
+              style={{ minWidth: "3rem", textAlign: "center" }}
+            />
 
             <Column
               field="name"
@@ -149,7 +178,7 @@ export default function Reservation() {
               style={{ minWidth: "12rem" }}
             />
             <Column
-              field="reservationId"
+              field="_id"
               header="Reservation Id"
               filter
               filterPlaceholder="Search by Reservation Id"
@@ -158,20 +187,23 @@ export default function Reservation() {
             <Column
               field="requestTime"
               header="Request Time"
+              body={requestTimeTemplate}
               style={{ minWidth: "14rem" }}
             />
             <Column
               field="startDateAndTime"
               header="Start Date & Time"
+              body={arrivalTimeTemplate}
               style={{ minWidth: "14rem" }}
             />
             <Column
               field="endDateAndTime"
               header="End Date & Time"
+              body={leaveTimeTemplate}
               style={{ minWidth: "14rem" }}
             />
             <Column
-              field="status"
+              field="state"
               header="Status"
               filter
               filterElement={statusRowFilterTemplate}
