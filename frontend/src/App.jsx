@@ -4,6 +4,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import ROUTES from "./utils/routes";
 import DashboardLayout from "./layout/DashboardLayout";
+import ProtectedRoute from "./context/ProtectedRoute";
 const HomePage = lazy(() => import("./pages/HomePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Lisitngs = lazy(() => import("./pages/Listing"));
@@ -13,13 +14,14 @@ const ListingView = lazy(() => import("./pages/ListingView"));
 const Earning = lazy(() => import("./pages/Earning"));
 const Setting = lazy(() => import("./pages/Setting"));
 const Notifications = lazy(() => import("./pages/Notifications"));
+const Login = lazy(() => import("./pages/Login"));
 function Fallback({ error }) {
   const regex = /\((.*?):\d+:\d+\)/;
 
   const match = error.stack.match(regex);
 
   if (match) {
-    const filePath = match[1]; 
+    const filePath = match[1];
     console.log("File path:", filePath); // Output: http://localhost:5173/src/App.jsx?t=1732289155098
 
     // If you want just the file name
@@ -56,7 +58,8 @@ function Fallback({ error }) {
 const AppRouter = () => {
   return (
     <Routes>
-      <Route element={<DashboardLayout />}>
+      <Route path={ROUTES.LOGIN} element={<Login />} />
+      <Route element={<ProtectedRoute element={<DashboardLayout />} />}>
         <Route index path={ROUTES.DASHBOARD} element={<HomePage />} />
         <Route path={ROUTES.HOME} element={<HomePage />} />
         <Route path={ROUTES.USERS.USERS_DATA} element={<Users />} />

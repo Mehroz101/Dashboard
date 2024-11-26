@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import SideNavbar from "../components/Sidebar/SideNavbar";
 import CustomSidebar from "../components/Sidebar/SideNavbar";
 
 const DashboardLayout = () => {
@@ -14,13 +13,13 @@ const DashboardLayout = () => {
   return (
     <>
       <div className="navbar">
-        <Navbar visible={visible} onShow={() => setVisible(true)}/>
+        <Navbar visible={visible} onShow={() => setVisible(true)} />
       </div>
       <div className="sidebar_components">
-      <CustomSidebar visible={visible} onHide={() => setVisible(false)} />
-       <div className="p-5">
-       <Outlet />
-       </div> 
+        <CustomSidebar visible={visible} onHide={() => setVisible(false)} />
+        <div className="p-5">
+          <Outlet />
+        </div>
       </div>
     </>
   );

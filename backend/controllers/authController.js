@@ -3,6 +3,7 @@ const bcryptjs = require("bcryptjs");
 const crypto = require("crypto"); // Signup function
 const sendEmail = require("../utils/sendEmail");
 const { generateToken } = require("../utils/generateToken");
+const Admin = require("../models/Admin");
 const signup = async (req, res) => {
   const { email, password, confirmPassword } = req.body;
 
@@ -154,10 +155,62 @@ const resetpass = async (req, res) => {
     res.status(500).send("Server error");
   }
 };
+const AdminLogin = async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const isUserExist = await Admin.findOne({ username });
+    if (!isUserExist) {
+      return res.status(404).json({
+        success: false,
+        message: "username not found",
+      });
+    }
+    const isMatch = await bcryptjs.compare(password, isUserExist.password);
 
+    if (!isMatch) {
+      res.status(401).json({
+        success: false,
+        message: "Incorrect password",
+      });
+    } else {
+      const token = generateToken(isUserExist); // Generate JWT token
+      res.status(200).json({
+        success: true,
+        message: "Login successful",
+        token,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+const checkLogin = async (req, res) => {
+  try {
+    console.log(req.user.id);
+    const admin = await Admin.findById(req.user.id);
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "Admin not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      admin,
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 module.exports = {
   signup,
   login,
   forget,
   resetpass,
+  AdminLogin,
+  checkLogin,
 };

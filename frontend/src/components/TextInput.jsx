@@ -42,10 +42,12 @@ function TextInput({
                 }}
                 style={{
                   width: "100%",
+                  borderRadius: "4px",
+                  fontSize: "1rem",
                 }}
                 pt={{
                   root: {
-                    style: { padding: "0.3rem 0.4rem", fontSize: ".9em" },
+                    style: { padding: "0.6rem 0.4rem", fontSize: ".9em" },
                   },
                 }}
                 onKeyDown={(e) => {

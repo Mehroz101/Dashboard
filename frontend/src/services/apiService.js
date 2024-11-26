@@ -1,5 +1,14 @@
 import axios from "axios";
 const API_URL = "http://localhost:5000";
+export const loginAdmin = async (data) => {
+  try {
+    console.log(data);
+    const response = await axios.post(`${API_URL}/api/admin/login`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 export const fetchUsers = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/user/allusers`);

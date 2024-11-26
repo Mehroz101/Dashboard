@@ -6,11 +6,20 @@ import { Link } from "react-router-dom";
 import "primeicons/primeicons.css";
 import "../../style/CustomSidebar.css"; // Optional CSS for custom styles
 import ROUTES from "../../utils/routes";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 const CustomSidebar = ({ visible, onHide }) => {
+  const navigate = useNavigate();
+
+  const { logout } = useAuth();
   const handleLinkClick = () => {
     onHide(); // Close the sidebar
   };
-
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   return (
     <Sidebar visible={visible} onHide={onHide} position="left">
       <div className="sidebar-header flex justify-content-start gap-2 align-items-center flex-row">
@@ -81,12 +90,16 @@ const CustomSidebar = ({ visible, onHide }) => {
         <li>
           <Link
             to={ROUTES.SETTINGS}
-            className="sidebar-link"
+            className="sidebar-link "
             onClick={handleLinkClick}
           >
             <i className="pi pi-cog"></i>
             Settings
           </Link>
+        </li>
+        <li className=" py-2 px-4 rext-black" onClick={() => handleLogout()}>
+          <i className="pi pi-sign-out pr-2"></i>
+          Logout
         </li>
       </ul>
     </Sidebar>

@@ -12,15 +12,18 @@ import { DashboardContextProvider } from "./context/DataContext.jsx";
 const queryClient = new QueryClient();
 
 import { PrimeReactProvider } from "primereact/api";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <DashboardContextProvider>
-        <PrimeReactProvider>
-          <App />
-        </PrimeReactProvider>
-      </DashboardContextProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <DashboardContextProvider>
+          <PrimeReactProvider>
+            <App />
+          </PrimeReactProvider>
+        </DashboardContextProvider>
+      </QueryClientProvider>
+    </AuthProvider>
   </React.StrictMode>
 );
