@@ -56,6 +56,7 @@ const allusers = async (req, res) => {
     console.log(error.message);
   }
 };
+<<<<<<< HEAD
 const addUser = async (req, res) => {
   const { fName, lName, Email, Number, Password } = req.body;
 
@@ -91,11 +92,16 @@ const addUser = async (req, res) => {
     });
   }
 };
+=======
+>>>>>>> c73989933118df8841a8ead3579468465d1f1064
 const edituser = async (req, res) => {
   try {
     const { userId, fName, lName, Email, Number, Password } = req.body;
 
+<<<<<<< HEAD
     // Check if the user exists
+=======
+>>>>>>> c73989933118df8841a8ead3579468465d1f1064
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -152,6 +158,9 @@ module.exports = {
   showAccountInformation,
   updateaccountinformation,
   allusers,
+<<<<<<< HEAD
   addUser,
+=======
+>>>>>>> c73989933118df8841a8ead3579468465d1f1064
   edituser,
 };

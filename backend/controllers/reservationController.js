@@ -156,6 +156,7 @@ const getReservation = async (req, res) => {
 const cancelReservation = async (req, res) => {
   try {
     const io = req.app.get("io");
+    console.log(req.body);
     const { reservationId } = req.body;
 
     if (!reservationId) {
@@ -545,6 +546,74 @@ const allReservation = async (req, res) => {
     console.log(error.message);
   }
 };
+const cancelReservationByAdmin = async (req, res) => {
+  try {
+    const { reservationId } = req.body;
+    console.log(req.body);
+    if (!reservationId) {
+      return res.status(400).json({ message: "Reservation ID is required" });
+    }
+
+    const reservations = await reservation.findById(reservationId);
+    if (!reservations) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Reservation not found" });
+    }
+
+    const spaces = await space.findById(reservations.spaceId);
+    if (!spaces) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Space not found" });
+    }
+
+    reservations.state = "cancelled";
+    await reservations.save();
+    return res.status(200).json({
+      success: true,
+      message: "Reservation cancelled successfully",
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while cancelling the reservation",
+    });
+  }
+};
+const confirmReservationByAdmin = async (req, res) => {
+  try {
+    console.log(req.body);
+
+    const { reservartionId } = req.body;
+
+    if (!reservartionId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Reservation ID is required" });
+    }
+    const getreservation = await reservation.findById(reservartionId); // Use the correct model name
+    if (!getreservation) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Reservation not found" });
+    }
+    getreservation.state = "confirmed";
+
+    const response = await getreservation.save();
+    console.log(response);
+    return res
+      .status(200)
+      .json({ success: true, message: "Reservation confirmed successfully" });
+  } catch (error) {
+    //console.log(error.message);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while cancelling the reservation",
+    });
+  }
+};
 module.exports = {
   createReservation,
   createCustomReservation,
@@ -561,4 +630,6 @@ module.exports = {
   braintreeTokenController,
   braintreePaymentController,
   allReservation,
+  confirmReservationByAdmin,
+  cancelReservationByAdmin,
 };

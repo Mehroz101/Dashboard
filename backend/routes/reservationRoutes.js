@@ -15,6 +15,8 @@ const {
   braintreeTokenController,
   braintreePaymentController,
   allReservation,
+  confirmReservationByAdmin,
+  cancelReservationByAdmin,
 } = require("../controllers/reservationController");
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -45,4 +47,9 @@ router.post(
   braintreePaymentController
 );
 router.get("/allreservations", authenticateToken, allReservation);
+<<<<<<< HEAD
+=======
+router.post("/cancelbyadmin", authenticateToken, cancelReservationByAdmin);
+router.post("/confirmbyadmin", authenticateToken, confirmReservationByAdmin);
+>>>>>>> c73989933118df8841a8ead3579468465d1f1064
 module.exports = router;

@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 const userSchema = new mongoose.Schema(
   {
-    userId: {
-      type: String,
-      default: uuidv4, // Automatically generate a unique UUID
-      unique: true,
-      immutable: true,
-    }, // Once set, userId cannot be changed
+    // userId: {
+    //   type: String,
+    //   default: uuidv4, // Automatically generate a unique UUID
+    //   unique: true,
+    //   immutable: true,
+    // }, // Once set, userId cannot be changed
     email: {
       type: String,
       unique: true,
@@ -28,11 +28,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    role: {
-      type: String,
-      enum: ["user", "admin", "owner"],
-      default: "user",
-    },
+
     isAccessToList: {
       type: Boolean,
       default: false,
@@ -43,6 +39,10 @@ const userSchema = new mongoose.Schema(
     resetPasswordExpires: {
       type: Date,
     },
+    // userStatus: {
+    //   type: Boolean,
+    //   default: true,
+    // },
   },
   {
     timestamps: true,
