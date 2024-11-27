@@ -12,6 +12,9 @@ import { Tag } from "primereact/tag";
 import { TriStateCheckbox } from "primereact/tristatecheckbox";
 import { accounts } from "../FakeData/CustomerService";
 import { Button } from "primereact/button";
+import { useMutation } from "@tanstack/react-query";
+import { acceptrequest, rejectrequest } from "../services/apiService";
+import { notify } from "../utils/notification";
 
 export default function Paymenttable({ earningData }) {
   const [customers, setCustomers] = useState(null);
@@ -68,11 +71,25 @@ export default function Paymenttable({ earningData }) {
       </div>
     );
   };
+  const acceptMutation = useMutation({
+    mutationFn: acceptrequest,
+    onSuccess: (data) => {
+      notify("Success", data.message);
+    },
+  });
+  const rejectMutation = useMutation({
+    mutationFn: rejectrequest,
+    onSuccess: (data) => {
+      notify("Success", data.message);
+    },
+  });
   const accept = (rowData) => {
     console.log(rowData);
+    acceptMutation.mutate(rowData._id);
   };
   const reject = (rowData) => {
     console.log(rowData);
+    rejectMutation.mutate(rowData._id);
   };
   const statusBodyTemplate = (rowData) => {
     return (
@@ -82,21 +99,23 @@ export default function Paymenttable({ earningData }) {
   const actionBodyTemplate = (rowData) => {
     return (
       <>
-        {rowData.status === "pending" && (
-          <div className="flex align-items-center justify-content-center gap-2 flex-nowrap">
-            <Button
-              icon="pi pi-ban"
-              className="p-button-danger"
-              onClick={() => reject(rowData)}
-            />
+        {/* {rowData.status === "pending" && ( */}
+        <div className="flex align-items-center justify-content-center gap-2 flex-nowrap">
+          <Button
+            icon="pi pi-ban"
+            className="p-button-danger"
+            tooltip="cencelled"
+            onClick={() => reject(rowData)}
+          />
 
-            <Button
-              icon="pi pi-check-circle"
-              className="p-button-success"
-              onClick={() => accept(rowData)}
-            />
-          </div>
-        )}
+          <Button
+            icon="pi pi-check-circle"
+            className="p-button-success"
+            tooltip="confirm"
+            onClick={() => accept(rowData)}
+          />
+        </div>
+        {/* ) } */}
       </>
     );
   };

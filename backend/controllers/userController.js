@@ -56,52 +56,10 @@ const allusers = async (req, res) => {
     console.log(error.message);
   }
 };
-<<<<<<< HEAD
-const addUser = async (req, res) => {
-  const { fName, lName, Email, Number, Password } = req.body;
-
-  try {
-    const isUserExist = await User.findOne({ email: Email });
-    if (isUserExist) {
-      return res.status(409).json({
-        success: false,
-        message: "User already exists",
-      });
-    }
-    const hashPassowrd = await bcryptjs.hash(Password, 10);
-
-    const newUser = new User({
-      email: Email,
-      password: hashPassowrd,
-      fName,
-      lName,
-      phone: Number,
-    });
-    const userCreated = await newUser.save();
-
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully!",
-      user: userCreated,
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
-  }
-};
-=======
->>>>>>> c73989933118df8841a8ead3579468465d1f1064
 const edituser = async (req, res) => {
   try {
     const { userId, fName, lName, Email, Number, Password } = req.body;
 
-<<<<<<< HEAD
-    // Check if the user exists
-=======
->>>>>>> c73989933118df8841a8ead3579468465d1f1064
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -158,9 +116,5 @@ module.exports = {
   showAccountInformation,
   updateaccountinformation,
   allusers,
-<<<<<<< HEAD
-  addUser,
-=======
->>>>>>> c73989933118df8841a8ead3579468465d1f1064
   edituser,
 };

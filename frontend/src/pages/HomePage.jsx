@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import "../style/HomePage.css";
 import Statistic_card from "../components/Statistic_card";
 import ChartLine from "../components/ChartLine";
@@ -10,7 +10,23 @@ import Reservation from "./Reservation";
 const HomePage = () => {
   const [totalRevenue, setTotalRevenue] = useState(0);
   const { reservationData, spaceData, earningData, userData } = useDashboard();
+  // Function to calculate revenue
+  const calculateRevenue = useCallback((data) => {
+    if (!data || data.length === 0) return 0;
+    console.log(data);
+    return data.reduce((total, item) => {
+      if (["confirmed", "completed", "reserved"].includes(item.state)) {
+        return total + (parseFloat(item.totalPrice) || 0);
+      }
+      return total;
+    }, 0);
+  }, []);
 
+  // Calculations
+  const revenue = useMemo(
+    () => calculateRevenue(reservationData),
+    [reservationData, calculateRevenue]
+  );
   useEffect(() => {
     setTotalRevenue(calculateRevenue(earningData));
   }, [earningData]);
@@ -40,7 +56,7 @@ const HomePage = () => {
           <Statistic_card
             card_number={4}
             card_heading={"Revenue"}
-            card_count={totalRevenue}
+            card_count={revenue}
             card_icon={"pi pi-wallet"}
           />
         </div>

@@ -74,6 +74,7 @@ const checkReservationStatus = async (req, res) => {
 
       // Check if the current time is past the arrival time
       if (now >= arrivalTime) {
+        reservation.totalBooking += 1;
         reservation.state = "reserved"; // Update state to 'reserved'
         await reservation.save();
         // console.log("reserved");

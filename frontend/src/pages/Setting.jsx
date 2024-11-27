@@ -1,48 +1,41 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import CustomInput from "../components/CustomInput";
-
+import { useAuth } from "../context/AuthContext";
+import { notify } from "../utils/notification";
+import { changePassword } from "../services/apiService";
+import { useMutation } from "@tanstack/react-query";
 const Setting = () => {
-  // Default values for the user settings form
-  const {
-    control: controlUser,
-    handleSubmit: handleUserSubmit,
-    formState: { errors: userErrors },
-  } = useForm({
-    defaultValues: {
-      name: "John",
-      email: "john.doe@example.com",
-    },
-  });
-
   // Default values for the password reset form
+  const { logout } = useAuth();
   const {
     control: controlPassword,
     handleSubmit: handlePasswordSubmit,
     formState: { errors: passwordErrors },
   } = useForm();
 
-  const onUserSubmit = (data) => {
-    console.log("User  Data:", data);
-  };
-
+  const passwordMutation = useMutation({
+    mutationFn: (data) => {
+      return changePassword(data);
+    },
+    onSuccess: (data) => {
+      notify("success", data.message);
+      logout();
+    },
+    onError: (error) => {
+      notify("error", error.message);
+      console.error("Error adding user:", error.message);
+    },
+  });
   const onPasswordSubmit = (data) => {
-    console.log("Password Data:", data);
-  };
-
-  const onUpload = () => {
-    console.log("File Uploaded");
-  };
-
-  const deletePicture = () => {
-    console.log("Picture Deleted");
+    passwordMutation.mutate(data);
   };
 
   return (
     <>
       <div className="setting_page mt-4 flex justify-content-center p-4">
         <div className="settings">
-          <div className="profile flex align-items-center justify-content-center gap-6 ">
+          {/* <div className="profile flex align-items-center justify-content-center gap-6 ">
             <div className="profile_pic overflow-hidden border-round-lg">
               <img
                 src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
@@ -71,10 +64,10 @@ const Setting = () => {
                 Delete Picture
               </button>
             </div>
-          </div>
+          </div> */}
 
           {/* User Settings Form */}
-          <div className="form mt-4 bg-white shadow-3 p-4">
+          {/* <div className="form mt-4 bg-white shadow-3 p-4">
             <form onSubmit={handleUserSubmit(onUserSubmit)}>
               <CustomInput
                 label="Full Name"
@@ -99,12 +92,20 @@ const Setting = () => {
                 Submit
               </button>
             </form>
-          </div>
+          </div> */}
 
           {/* Password Reset Form */}
           <div className="form mt-4 shadow-3 bg-white p-4">
-            <h2 className="text-lg font-semibold">Reset Password</h2>
+            <h2 className="text-lg font-semibold">Setting</h2>
             <form onSubmit={handlePasswordSubmit(onPasswordSubmit)}>
+              <CustomInput
+                label="Username"
+                name="username"
+                control={controlPassword}
+                type="text"
+                placeholder="Enter your username"
+                required={true}
+              />
               <CustomInput
                 label="Old Password"
                 name="oldPassword"

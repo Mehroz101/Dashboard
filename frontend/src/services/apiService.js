@@ -29,7 +29,7 @@ export const fetchUsers = async () => {
       },
     };
     const response = await axios.get(`${API_URL}/api/user/allusers`, config);
-    return response.data;
+    return response.data || [];
   } catch (error) {
     notify("error", error.response.data.message);
   }
@@ -85,7 +85,7 @@ export const fetchAllReservationData = async () => {
       config
     );
     console.log(response.data);
-    return response.data;
+    return response.data || [];
   } catch (error) {
     notify("error", error.response.data.message);
   }
@@ -100,11 +100,11 @@ export const fetchAllSpaceData = async () => {
       },
     };
     const response = await axios.get(
-      `${API_URL}/api/spaces/getallspaces`,
+      `${API_URL}/api/spaces/getallspacesbyadmin`,
       config
     );
     console.log(response.data.data);
-    return response.data.data;
+    return response.data.data || [];
   } catch (error) {
     notify("error", error.response.data.message);
   }
@@ -123,7 +123,7 @@ export const fetchAllEarningData = async () => {
       config
     );
     console.log(response.data);
-    return response.data;
+    return response.data || [];
   } catch (error) {
     notify("error", error.response.data.message);
   }
@@ -139,7 +139,7 @@ export const fetchAllUserData = async () => {
     };
     const response = await axios.get(`${API_URL}/api/user/allusers`, config);
     console.log(response.data);
-    return response.data;
+    return response.data || [];
   } catch (error) {
     notify("error", error.response.data.message);
   }
@@ -189,7 +189,91 @@ export const cencelrequest = async (reservationId) => {
     notify("error", error.response.data.message);
   }
 };
-
+export const updateStatus = async (spaceId) => {
+  try {
+    const data = { spaceId };
+    console.log(data);
+    const token = localStorage.getItem("admintoken");
+    console.log(token); // Retrieve the token from localStorage
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
+    };
+    const response = await axios.patch(
+      `${API_URL}/api/spaces/updatebyadmin`,
+      data,
+      config
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    notify("error", error.response.data.message);
+  }
+};
+export const acceptrequest = async (paymentId) => {
+  try {
+    const data = { paymentId };
+    console.log(data);
+    const token = localStorage.getItem("admintoken");
+    console.log(token); // Retrieve the token from localStorage
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
+    };
+    const response = await axios.post(
+      `${API_URL}/api/withdraw/acceppaytbyadmin`,
+      data,
+      config
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    notify("error", error.response.data.message);
+  }
+};
+export const rejectrequest = async (paymentId) => {
+  try {
+    const data = { paymentId };
+    console.log(data);
+    const token = localStorage.getItem("admintoken");
+    console.log(token); // Retrieve the token from localStorage
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
+    };
+    const response = await axios.post(
+      `${API_URL}/api/withdraw/rejectpaytbyadmin`,
+      data,
+      config
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    notify("error", error.response.data.message);
+  }
+};
+export const changePassword = async (data) => {
+  try {
+    const token = localStorage.getItem("admintoken"); // Retrieve the token from localStorage
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
+    };
+    console.log(data);
+    const response = await axios.post(
+      `${API_URL}/api/admin/changepassword`,
+      data,
+      config
+    );
+    return response.data;
+  } catch (error) {
+    notify("error", error.response.data.message);
+  }
+};
 export const fetchAllSpaceReviewsData = async (spaceId) => {
   // const response = await axios.get(`${API_URL}/spaces/${spaceId}/reviews`);
   // const data = await response.json();

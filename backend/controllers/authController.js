@@ -206,6 +206,37 @@ const checkLogin = async (req, res) => {
     console.log(error.message);
   }
 };
+const changepassword = async (req, res) => {
+  try {
+    const { username, oldPassword, newPassword } = req.body;
+    const admin = await Admin.findOne({ username });
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "Admin not found",
+      });
+    }
+    const isMatch = await bcryptjs.compare(oldPassword, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Incorrect password",
+      });
+    }
+    const hashPassowrd = await bcryptjs.hash(newPassword, 10);
+    admin.password = hashPassowrd;
+    await admin.save();
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
 module.exports = {
   signup,
   login,
@@ -213,4 +244,5 @@ module.exports = {
   resetpass,
   AdminLogin,
   checkLogin,
+  changepassword,
 };

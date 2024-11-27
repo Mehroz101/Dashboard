@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Menubar } from "primereact/menubar";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
@@ -7,24 +7,23 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Navbar({ onShow }) {
   const { checkuser } = useAuth();
+  const [userStatus, setUserStatus] = useState(null);
 
-  const end = checkuser() ? (
+  const end = userStatus ? (
     <>
-      <div className="flex align-items-center">
-        <Avatar
-          image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-          shape="circle"
-          className="mr-2"
-        />
-        <span className="mr-2">Admin</span>
-      </div>
+      <Link to="/login" className="login_btn">
+        <Button label="Login" className="p-button-text" />
+      </Link>
     </>
   ) : (
-    <Link to="/login" className="login_btn">
-      <Button label="Login" className="p-button-text" />
-    </Link>
+    <div className="flex align-items-center">
+      <span className="mr-2">Admin Dashboard</span>
+    </div>
   );
-
+  useEffect(() => {
+    const status = checkuser();
+    setUserStatus(status);
+  }, [checkuser]);
   return (
     <div className="card">
       <Menubar

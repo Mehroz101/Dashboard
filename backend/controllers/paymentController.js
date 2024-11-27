@@ -194,9 +194,58 @@ const braintreePaymentController = async (req, res) => {
 const allEarnings = async (req, res) => {
   try {
     const response = await Payment.find();
+
     res.status(200).json(response);
   } catch (error) {
     console.log(error.message);
+  }
+};
+const rejectpaytbyadmin = async (req, res) => {
+  try {
+    const { paymentId } = req.body;
+    const response = await Payment.findById(paymentId);
+    if (!response) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment not found",
+      });
+    }
+    response.status = "rejected";
+    await response.save();
+    res.status(200).json({
+      success: true,
+      message: "Payment rejected",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+const acceppaytbyadmin = async (req, res) => {
+  try {
+    const { paymentId } = req.body;
+
+    const response = await Payment.findById(paymentId);
+    if (!response) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment not found",
+      });
+    }
+
+    response.status = "paid";
+    await response.save();
+    res.status(200).json({
+      success: true,
+      message: "Payment accepted",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
 
@@ -206,4 +255,6 @@ module.exports = {
   braintreeTokenController,
   braintreePaymentController,
   allEarnings,
+  rejectpaytbyadmin,
+  acceppaytbyadmin,
 };

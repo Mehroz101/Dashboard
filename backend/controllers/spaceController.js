@@ -143,7 +143,7 @@ const getspacedetail = async (req, res) => {
 };
 
 const updateSpaceDetails = async (req, res) => {
-  const userId= req.user.id;
+  const userId = req.user.id;
   const { spaceId } = req.params;
   const {
     title,
@@ -314,7 +314,44 @@ const getAllReviews = async (req, res) => {
     //console.log(error.message)
   }
 };
+const toggleSpaceStatusByAdmin = async (req, res) => {
+  try {
+    const { spaceId } = req.body;
 
+    const space = await Space.findById(spaceId);
+    if (!space) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Space not found" });
+    }
+
+    // Toggle the state
+    space.state = space.state === "active" ? "deactivated" : "active";
+
+    await space.save();
+
+    res.status(200).json({ success: true, message: "Space status updated" });
+  } catch (error) {
+    // console.error(success: false,"Error toggling space status:");
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+const getallspacesbyadmin = async (req, res) => {
+  try {
+    console.log("getallspacesbyadmin");
+    const spaces = await Space.find();
+    if (spaces.length === 0) {
+      return res.status(404).json();
+    }
+
+    return res.status(201).json({ data: spaces });
+  } catch (error) {
+    // console.error("Error fetching spaces:", error.message);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
 module.exports = {
   createSpace,
   showSpace,
@@ -326,4 +363,6 @@ module.exports = {
   getspacedetailforreservation,
   getSpaceReviews,
   getAllReviews,
+  toggleSpaceStatusByAdmin,
+  getallspacesbyadmin,
 };

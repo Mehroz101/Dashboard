@@ -15,6 +15,9 @@ import Statistic_card from "../components/Statistic_card";
 import { useNavigate } from "react-router";
 import ROUTES from "../utils/routes";
 import { useDashboard } from "../context/DataContext";
+import { updateStatus } from "../services/apiService";
+import { useMutation } from "@tanstack/react-query";
+import { notify } from "../utils/notification";
 
 export default function BasicFilterDemo() {
   const [customers, setCustomers] = useState(null);
@@ -27,7 +30,7 @@ export default function BasicFilterDemo() {
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [statuses] = useState(["active", "deactiveted"]);
-  const { spaceData } = useDashboard();
+  const { spaceData, getSpaceData } = useDashboard();
 
   const Navigate = useNavigate();
   const getSeverity = (status) => {
@@ -93,37 +96,39 @@ export default function BasicFilterDemo() {
   const statusItemTemplate = (option) => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
+  const toggleStatusMutation = useMutation({
+    mutationFn: updateStatus,
+    onSuccess: (data) => {
+      console.log(data);
+      getSpaceData();
+      notify("success", data.message);
+      getReservationData();
+    },
+    onError: (error) => {
+      console.error("Error adding user:", error.message);
+    },
+  });
 
   const verifiedBodyTemplate = (rowData) => {
-    const toggleStatus = () => {
+    const toggleStatus = (id) => {
       // Create a new array with the updated status
-      const updatedCustomers = customers.map((customer) => {
-        if (customer._id === rowData._id) {
-          updateSpaceStatus(rowData._id);
-        }
-        return customer;
-      });
-      setCustomers(updatedCustomers);
+      toggleStatusMutation.mutate(id);
     };
-    const snoBodyTemplate = (rowData, options) => {
-      return options.rowIndex + 1; // Row index starts from 0, so add 1 for 1-based numbering
-    };
-
     return (
       <div>
-        {rowData.status === "active" ? (
-          <Button
-            // label="Active"
-            icon="pi pi-check"
-            className="p-button-success"
-            onClick={toggleStatus}
-          />
-        ) : (
+        {rowData.state === "active" ? (
           <Button
             // label="Inactive"
             icon="pi pi-times"
             className="p-button-danger"
-            onClick={toggleStatus}
+            onClick={() => toggleStatus(rowData._id)}
+          />
+        ) : (
+          <Button
+            // label="Active"
+            icon="pi pi-check"
+            className="p-button-success"
+            onClick={() => toggleStatus(rowData._id)}
           />
         )}
       </div>
@@ -152,7 +157,9 @@ export default function BasicFilterDemo() {
     return <Rating value={rowData.averageRating} readOnly cancel={false} />;
   };
   const header = renderHeader();
-
+  const snoBodyTemplate = (rowData, options) => {
+    return options.rowIndex + 1; // Row index starts from 0, so add 1 for 1-based numbering
+  };
   return (
     <>
       <div
@@ -198,9 +205,9 @@ export default function BasicFilterDemo() {
         >
           <Column
             header="Sno."
-            headerStyle={{ width: "3rem" }}
-            body={(options) => options.rowIndex + 1}
-          ></Column>
+            body={snoBodyTemplate}
+            style={{ minWidth: "3rem", textAlign: "center" }}
+          />
           <Column
             header="Id"
             field="_id"
