@@ -44,5 +44,5 @@ router.post(
   authenticateToken,
   braintreePaymentController
 );
-router.get("/allreservations", allReservation);
+router.get("/allreservations", authenticateToken, allReservation);
 module.exports = router;

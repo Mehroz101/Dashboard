@@ -35,7 +35,7 @@ router.put(
 );
 router.delete("/deletespace/:spaceId", authenticateToken, deleteSpace);
 
-router.get("/getallspaces", getallspaces);
+router.get("/getallspaces", authenticateToken, getallspaces);
 router.get("/getspacereviews/:spaceId", getSpaceReviews);
 router.get("/getallspacereview", getAllReviews);
 

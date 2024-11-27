@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post("/request", authenticateToken, withdrawRequest);
 router.get("/get", authenticateToken, getWithdrawRequest);
-router.get("/allearnings", allEarnings);
+router.get("/allearnings", authenticateToken, allEarnings);
 // router.get("/braintee/token", braintreeTokenController);
 // router.post(
 //   "/braintree/payment",
