@@ -27,11 +27,11 @@ export default function Paymenttable({ earningData }) {
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
 
-  const [statuses] = useState(["cancelled", "paid", "pending"]);
+  const [statuses] = useState(["rejected", "paid", "pending"]);
 
   const getSeverity = (status) => {
     switch (status) {
-      case "cancelled":
+      case "rejected":
         return "danger";
 
       case "paid":
