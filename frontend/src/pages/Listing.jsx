@@ -29,7 +29,7 @@ export default function BasicFilterDemo() {
   });
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
-  const [statuses] = useState(["active", "deactiveted"]);
+  const [statuses] = useState(["active", "deactivated"]);
   const { spaceData, getSpaceData } = useDashboard();
 
   const Navigate = useNavigate();
@@ -149,10 +149,10 @@ export default function BasicFilterDemo() {
       />
     );
   };
-  const viewData = (e) => {
-    console.log(e.data);
-    Navigate(ROUTES.LISTING.LISTING_VIEW + `/${e.data.id}`);
-  };
+  // const viewData = (e) => {
+  //   console.log(e.data);
+  //   Navigate(ROUTES.LISTING.LISTING_VIEW + `/${e.data.id}`);
+  // };
   const ratingBodyTemplate = (rowData) => {
     return <Rating value={rowData.averageRating} readOnly cancel={false} />;
   };
@@ -197,7 +197,7 @@ export default function BasicFilterDemo() {
           filters={filters}
           filterDisplay="row"
           selectionMode="single"
-          onRowSelect={viewData}
+{/*           onRowSelect={viewData} */}
           loading={loading}
           globalFilterFields={["title", "city", "_id", "state"]}
           header={header}
