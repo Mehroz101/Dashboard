@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import { useAuth } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 const ProtectedRoute = ({ element }) => {
   const navigate = useNavigate();
